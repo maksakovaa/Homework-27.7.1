@@ -12,6 +12,11 @@ string curDateTime()
 	return result;
 }
 
+string logTimeStamp()
+{
+	return "[" + curDateTime() + "] ";
+}
+
 Settings::Settings()
 {
 #if defined (_WIN32) || defined (_WIN64)

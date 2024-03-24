@@ -6,18 +6,18 @@ SQL_DB::SQL_DB()
 	mysql_init(&mysql);
 	if (&mysql == NULL)
 	{
-		cout << "[" << curDateTime() << "] " << "[MySQL] ERROR: Ошибка создания MySQL дескриптора" << endl;
+		cout << logTimeStamp() << "[MySQL] ERROR: Ошибка создания MySQL дескриптора" << endl;
 		exit(1);
 	}
 
 	if (!mysql_real_connect(&mysql, mysql_srv_ip.data(), mysql_login.data(), mysql_pass.data(), NULL, 0, NULL, 0))
 	{
-		cout << "[" << curDateTime() << "] " << "[MySQL] ERROR: Ошибка подключения к базе данных " << mysql_error(&mysql) << endl;
+		cout << logTimeStamp() << "[MySQL] ERROR: Ошибка подключения к базе данных " << mysql_error(&mysql) << endl;
 		exit(1);
 	}
 	else
 	{
-		cout << "[" << curDateTime() << "] " << "[MySQL] Соединение установлено." << endl;
+		cout << logTimeStamp() << "[MySQL] Соединение установлено." << endl;
 	}
 	mysql_set_character_set(&mysql, "utf8");
 	firstRun();
@@ -26,7 +26,7 @@ SQL_DB::SQL_DB()
 SQL_DB::~SQL_DB()
 {
 	mysql_close(&mysql);
-	cout << "[" << curDateTime() << "] " "[MySQL] Соединение закрыто." << endl;
+	cout << logTimeStamp() << "[MySQL] Соединение закрыто." << endl;
 }
 
 void SQL_DB::getConfig()
@@ -131,11 +131,11 @@ void SQL_DB::getRequest(const string& request)
 	mysql_query(&mysql, m_query.data());
 	if (result = mysql_store_result(&mysql))
 	{
-		cout << "[" << curDateTime() << "] " << "[MySQL] Запрос " << request << " выполнен успешно." << endl;
+		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен успешно." << endl;
 	}
 	else
 	{
-		cout << "[" << curDateTime() << "] " << "[MySQL] Ошибка MySQL " << mysql_error(&mysql) << endl;
+		cout << logTimeStamp() << "[MySQL] Ошибка MySQL " << mysql_error(&mysql) << endl;
 	}
 	m_query.clear();
 }
@@ -145,11 +145,11 @@ void SQL_DB::sendRequest(const string& request)
 	int query = mysql_query(&mysql, m_query.data());
 	if (query == 0)
 	{
-		cout << "[" << curDateTime() << "] " << "[MySQL] Запрос " << request << " выполнен успешно." << endl;
+		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен успешно." << endl;
 	}
 	else
 	{
-		cout << "[" << curDateTime() << "] " << "[MySQL] Запрос " << request << " выполнен c ошибкой: " << query << endl;
+		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен c ошибкой: " << query << endl;
 	}
 	m_query.clear();
 }
@@ -163,7 +163,7 @@ void SQL_DB::getUserBase()
 	{
 		User newUser(row[0], row[1], row[2], row[3], atoi(row[4]));
 		UserBase->addInBase(newUser);
-		cout << "[" << curDateTime() << "] " << "[MySQL] Пользователь " << newUser.name << " добавлен в базу" << endl;
+		cout << logTimeStamp() << "[MySQL] Пользователь " << newUser.name << " добавлен в базу" << endl;
 	}
 	if (UserBase->getCount() == 0)
 	{

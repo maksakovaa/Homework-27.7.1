@@ -28,6 +28,7 @@ using std::endl;
 using std::cin;
 
 string curDateTime();
+string logTimeStamp();
 
 class Settings
 {

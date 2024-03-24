@@ -33,7 +33,7 @@ void net::convertIp()
 	erStat = inet_pton(AF_INET, server_ip.data(), &ip_to_num);
 
 	if (erStat <= 0) {
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: Ошибка преобразования IP адреса в специальный цифровой формат." << endl;
+		cout << logTimeStamp() << "[NET] ERROR: Ошибка преобразования IP адреса в специальный цифровой формат." << endl;
 		exit(1);
 	}
 }
@@ -42,13 +42,13 @@ void net::initWinsock()
 {
 	if ((erStat = WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0)
 	{
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: Ошибка инициализации WSAStartup" << erStat;
+		cout << logTimeStamp() << "[NET] ERROR: Ошибка инициализации WSAStartup" << erStat;
 		exit(1);
 	}
 
 	else
 	{
-		cout << "[" << curDateTime() << "] " << "[NET] WSAStartup: " << wsaData.szSystemStatus << endl;
+		cout << logTimeStamp() << "[NET] WSAStartup: " << wsaData.szSystemStatus << endl;
 	}
 }
 
@@ -68,18 +68,18 @@ void net::createSocket()
 	ServSock = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (ServSock == INVALID_SOCKET) {
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: " << WSAGetLastError() << " Ошибка создания сокета." << endl;
+		cout << logTimeStamp() << "[NET] ERROR: " << WSAGetLastError() << " Ошибка создания сокета." << endl;
 		closesocket(ServSock);
 		WSACleanup();
 		exit(1);
 	}
 	else
-		cout << "[" << curDateTime() << "] " << "[NET] Инициализация сокета успешна." << endl;
+		cout << logTimeStamp() << "[NET] Инициализация сокета успешна." << endl;
 #elif defined (__linux__)
 	socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_fd == -1)
 	{
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: Ошибка создания сокета." << endl;
+		cout << logTimeStamp() << "[NET] ERROR: Ошибка создания сокета." << endl;
 		exit(1);
 	}
 #endif
@@ -97,13 +97,13 @@ void net::bindSocket()
 
 	erStat = bind(ServSock, (sockaddr*)&servInfo, sizeof(servInfo));
 	if (erStat != 0) {
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: " << WSAGetLastError() << " Ошибка привязки сокета # " << endl;
+		cout << logTimeStamp() << "[NET] ERROR: " << WSAGetLastError() << " Ошибка привязки сокета # " << endl;
 		closesocket(ServSock);
 		WSACleanup();
 		exit(1);
 	}
 	else
-		cout << "[" << curDateTime() << "] " << "[NET] Привязка сокета выполнена." << endl;
+		cout << logTimeStamp() << "[NET] Привязка сокета выполнена." << endl;
 #elif defined (__linux__)
 	srvaddress.sin_addr.s_addr = htonl(INADDR_ANY);
 	srvaddress.sin_port = htons(std::stoi(chat_port));
@@ -112,11 +112,11 @@ void net::bindSocket()
 	erStat = bind(socket_fd, (struct sockaddr*)&srvaddress, sizeof(srvaddress));
 	if (erStat == -1)
 	{
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: Ошибка привязки сокета." << endl;
+		cout << logTimeStamp() << "[NET] ERROR: Ошибка привязки сокета." << endl;
 		exit(1);
 	}
 	else
-		cout << "[" << curDateTime() << "] " << "[NET] Привязка сокета выполнена." << endl;
+		cout << logTimeStamp() << "[NET] Привязка сокета выполнена." << endl;
 #endif
 }
 
@@ -126,24 +126,24 @@ void net::servlisten()
 	erStat = listen(ServSock, SOMAXCONN);
 
 	if (erStat != 0) {
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: Ошибка при постановке на приём данных # " << WSAGetLastError() << endl;
+		cout << logTimeStamp() << "[NET] ERROR: Ошибка при постановке на приём данных # " << WSAGetLastError() << endl;
 		closesocket(ServSock);
 		WSACleanup();
 		exit(1);
 	}
 	else {
-		cout << "[" << curDateTime() << "] " << "[NET] Ожидание подключений..." << endl;
+		cout << logTimeStamp() << "[NET] Ожидание подключений..." << endl;
 	}
 #elif defined (__linux__)
 	erStat = listen(socket_fd, 20);
 	if (erStat == -1)
 	{
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: Ошибка при постановке на приём данных." << endl;
+		cout << logTimeStamp() << "[NET] ERROR: Ошибка при постановке на приём данных." << endl;
 		exit(1);
 	}
 	else
 	{
-		cout << "[" << curDateTime() << "] " << "[NET] Ожидание подключений..." << endl;
+		cout << logTimeStamp() << "[NET] Ожидание подключений..." << endl;
 	}
 #endif
 }
@@ -157,24 +157,24 @@ void net::acceptConnection()
 	ClientConn = accept(ServSock, (sockaddr*)&clientInfo, &clientInfo_size);
 
 	if (ClientConn == INVALID_SOCKET) {
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: " << WSAGetLastError() << " Сервер несмог принять данные от клиента." << endl;
+		cout << logTimeStamp() << "[NET] ERROR: " << WSAGetLastError() << " Сервер несмог принять данные от клиента." << endl;
 		closesocket(ServSock);
 		closesocket(ClientConn);
 		WSACleanup();
 		exit(1);
 	}
 	else
-		cout << "[" << curDateTime() << "] " << "[NET] Соеединение успешно установлено" << endl;
+		cout << logTimeStamp() << "[NET] Соеединение успешно установлено" << endl;
 #elif defined (__linux__)
 	length = sizeof(client);
 	connection = accept(socket_fd, (struct sockaddr*)&client, &length);
 	if (connection == -1)
 	{
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: Сервер несмог принять данные от клиента." << endl;
+		cout << logTimeStamp() << "[NET] ERROR: Сервер несмог принять данные от клиента." << endl;
 		exit(1);
 	}
 	else
-		cout << "[" << curDateTime() << "] " << "[NET] Соеединение успешно установлено" << endl;
+		cout << logTimeStamp() << "[NET] Соеединение успешно установлено" << endl;
 #endif
 }
 
@@ -200,7 +200,7 @@ void net::sendRequest(const string& reqName)
 	int packet_size = send(ClientConn, package, sizeof(package), 0);
 
 	if (packet_size == SOCKET_ERROR) {
-		cout << "[" << curDateTime() << "] " << "[NET] ERROR: " << WSAGetLastError() << " Ошибка отправки сообщения клиенту." << endl;
+		cout << logTimeStamp() << "[NET] ERROR: " << WSAGetLastError() << " Ошибка отправки сообщения клиенту." << endl;
 		closesocket(ServSock);
 		closesocket(ClientConn);
 		WSACleanup();
@@ -208,13 +208,13 @@ void net::sendRequest(const string& reqName)
 	}
 	else
 	{
-		cout << "[" << curDateTime() << "] [NET] " << reqName << " send" << endl;
+		cout << logTimeStamp() << "[NET] " << reqName << " send" << endl;
 	}
 #elif defined (__linux__)
 	ssize_t bytes = write(connection, package, sizeof(package));
 	if (bytes >= 0)
 	{
-		cout << "[" << curDateTime() << "] [NET] " << reqName << " send" << endl;
+		cout << logTimeStamp() << "[NET] " << reqName << " send" << endl;
 	}
 #endif
 }
@@ -233,7 +233,7 @@ bool net::isExit()
 {
 	if (strncmp("disconnect", package, sizeof("disconnect") - 1) == 0)
 	{
-		cout << "[" << curDateTime() << "] [NET] Соединение закрыто по запросу клиента." << endl;
+		cout << logTimeStamp() << "[NET] Соединение закрыто по запросу клиента." << endl;
 		return true;
 	}
 	else
@@ -287,7 +287,7 @@ void net::cutRequestHeader(string& request)
 
 void net::sendUsrBase()
 {
-	cout << "[" << curDateTime() << "] " << "[NET] GET_USRBASE request accepted" << endl;
+	cout << logTimeStamp() << "[NET] GET_USRBASE request accepted" << endl;
 	if (UserBase->getCount() == 0)
 	{
 		db_connect->getUserBase();
@@ -311,7 +311,7 @@ void net::sendUsrBase()
 
 void net::sendPerMsgBase()
 {
-	cout << "[" << curDateTime() << "] " << "[NET] GET_PER_MSGBASE request accepted" << endl;
+	cout << logTimeStamp() << "[NET] GET_PER_MSGBASE request accepted" << endl;
 
 	string uuid = package;
 	cutRequestHeader(uuid);
@@ -345,7 +345,7 @@ void net::sendPerMsgBase()
 
 void net::sendAllMsgBase()
 {
-	cout << "[" << curDateTime() << "] " << "[NET] GET_ALL_MSGBASE request accepted" << endl;
+	cout << logTimeStamp() << "[NET] GET_ALL_MSGBASE request accepted" << endl;
 	string uuid = package;
 	cutRequestHeader(uuid);
 	db_connect->getAllMsgBase(uuid);
@@ -378,18 +378,18 @@ void net::sendAllMsgBase()
 
 void net::regUser()
 {
-	cout << "[" << curDateTime() << "] " << "[NET] REG_USER request accepted" << endl;
+	cout << logTimeStamp() << "[NET] REG_USER request accepted" << endl;
 	string temp = package;
 	cutRequestHeader(temp);
 	User newUser = UserBase->splitUsrPkg(temp);
 	db_connect->regUser(newUser);
 	db_connect->getUserBase();
-	cout << "[" << curDateTime() << "] " << "[NET] User " << newUser.name << " registered" << endl;
+	cout << logTimeStamp() << "[NET] User " << newUser.name << " registered" << endl;
 }
 
 void net::regMSG()
 {
-	cout << "[" << curDateTime() << "] " << "[NET] SND_MSG request accepted" << endl;
+	cout << logTimeStamp() << "[NET] SND_MSG request accepted" << endl;
 	string temp = package;
 	cutRequestHeader(temp);
 
@@ -409,34 +409,34 @@ void net::regMSG()
 		db_connect->regPrivateMsg(newMsg);
 		db_connect->getPerMsgBase(newMsg.msgFrom);
 	}
-	cout << "[" << curDateTime() << "] " << "[NET] Message " << newMsg.msgText << " send" << endl;
+	cout << logTimeStamp() << "[NET] Message " << newMsg.msgText << " send" << endl;
 }
 
 void net::delUsr()
 {
-	cout << "[" << curDateTime() << "] " << "[NET] DEL_USER request accepted" << endl;
+	cout << logTimeStamp() << "[NET] DEL_USER request accepted" << endl;
 	string uuid = package;
 	cutRequestHeader(uuid);
 	db_connect->delUser(uuid);
 	db_connect->getUserBase();
-	cout << "[" << curDateTime() << "] " << "[NET] User with UUID " << uuid << " deleted." << endl;
+	cout << logTimeStamp() << "[NET] User with UUID " << uuid << " deleted." << endl;
 }
 
 void net::chgPwd()
 {
-	cout << "[" << curDateTime() << "] " << "[NET] CHG_PWD request accepted" << endl;
+	cout << logTimeStamp() << "[NET] CHG_PWD request accepted" << endl;
 	string temp = package;
 	cutRequestHeader(temp);
 	string arr[2];
 	UserBase->splitChgPwd(temp, arr);
 	db_connect->chgPwd(arr[0], arr[1]);
 	db_connect->getUserBase();
-	cout << "[" << curDateTime() << "] " << "[NET] Password for user " << UserBase->getUser(arr[0]).name << " changed" << endl;
+	cout << logTimeStamp() << "[NET] Password for user " << UserBase->getUser(arr[0]).name << " changed" << endl;
 }
 
 void net::setPMStatus()
 {
-	cout << "[" << curDateTime() << "] " << "[NET] SET_PMSG_STATUS request accepted" << endl;
+	cout << logTimeStamp() << "[NET] SET_PMSG_STATUS request accepted" << endl;
 	string temp = package;
 	cutRequestHeader(temp);
 	int arr[2];
@@ -446,7 +446,7 @@ void net::setPMStatus()
 
 void net::setAMStatus()
 {
-	cout << "[" << curDateTime() << "] " << "[NET] SET_PMSG_STATUS request accepted" << endl;
+	cout << logTimeStamp() << "[NET] SET_PMSG_STATUS request accepted" << endl;
 	string temp = package;
 	cutRequestHeader(temp);
 	string arr[3];
