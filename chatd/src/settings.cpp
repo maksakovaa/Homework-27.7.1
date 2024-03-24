@@ -150,7 +150,7 @@ void Settings::saveConfig()
 	std::ofstream config(cfgPath, std::ios::trunc);
 	if (!config.is_open())
 	{
-		cout << "[" << curDateTime() << "] ERROR: Îøèáêà îòêðûòèÿ ôàéëà!" << endl;
+		cout << "[" << curDateTime() << "] ERROR: ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ñ‚ÐºÑ€Ñ‹Ñ‚Ð¸Ñ Ñ„Ð°Ð¹Ð»Ð°!" << endl;
 	}
 	else
 	{
