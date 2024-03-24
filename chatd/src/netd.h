@@ -4,7 +4,7 @@
 using std::cout;
 using std::endl;
 
-extern Logger* logNewMsg;
+extern Logger* Log;
 extern Settings* Config;
 extern UsrBase* UserBase;
 extern MsgBase* AllMsgBase;
@@ -41,6 +41,7 @@ public:
 	void setPMStatus();
 	void setAMStatus();
 private:
+	void logging(const string& entry);
 	string server_ip, chat_port, reqName, delim{"<|>"};
 	static const int pkg_length = 1024;
 	char package[pkg_length];

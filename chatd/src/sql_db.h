@@ -1,6 +1,7 @@
 #pragma once
 #include "MsgBased.h"
 
+extern Logger* Log;
 extern Settings* Config;
 extern UsrBase* UserBase;
 extern MsgBase* AllMsgBase;
@@ -37,4 +38,5 @@ private:
 	string mysql_table_AM;
 	string mysql_table_AMS;
 	string mysql_table_PM;
+	void logging(const string& entry);
 };

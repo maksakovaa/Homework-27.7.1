@@ -1,37 +1,38 @@
 #include "Logger.h"
 Logger::Logger()
 {
-	log.open(log_file, std::ios::in | std::ios::app);
+	slog.open(log_file, std::ios::in | std::ios::app);
 }
 
 Logger::~Logger()
 {
-	log.close();
+	slog.close();
 }
 
 void Logger::recLogEntry(const string& entry)
 {
 	s_mutex.lock();
-	log << entry;
-	log << "\n";
+	slog << entry;
+	slog << "\n";
 	s_mutex.unlock();
 }
 
 void Logger::readLogEntry()
 {
+	std::this_thread::sleep_for(std::chrono::microseconds(100));
 	s_mutex.lock_shared();
-	log.seekg(diff, std::ios_base::end);
-	log.seekg(diff, std::ios_base::cur);
-	for (long long int i = log.tellg(); i >= 0; --i)
+	slog.seekg(diff, std::ios_base::end);
+	slog.seekg(diff, std::ios_base::cur);
+	for (long long int i = slog.tellg(); i >= 0; --i)
 	{
-		if (log.peek() == '\n')
+		if (slog.peek() == '\n')
 		{
-			log.get();
+			slog.get();
 			break;
 		}
-		log.seekg(i, std::ios_base::beg);
+		slog.seekg(i, std::ios_base::beg);
 	}
-	getline(log, logEntry);
+	getline(slog, logEntry);
 	cout << logEntry << endl;
 	s_mutex.unlock_shared();
 }

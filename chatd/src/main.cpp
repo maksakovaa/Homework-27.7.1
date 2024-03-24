@@ -1,5 +1,5 @@
 #include "netd.h"
-Logger* logNewMsg = new Logger;
+Logger* Log = new Logger;
 Settings* Config = new Settings;
 UsrBase* UserBase = new UsrBase;
 MsgBase* AllMsgBase = new MsgBase;

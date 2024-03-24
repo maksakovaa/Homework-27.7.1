@@ -6,18 +6,21 @@ SQL_DB::SQL_DB()
 	mysql_init(&mysql);
 	if (&mysql == NULL)
 	{
-		cout << logTimeStamp() << "[MySQL] ERROR: Ошибка создания MySQL дескриптора" << endl;
+		logging(logTimeStamp() + "[MySQL] ERROR: Ошибка создания MySQL дескриптора");
+//		cout << logTimeStamp() << "[MySQL] ERROR: Ошибка создания MySQL дескриптора" << endl;
 		exit(1);
 	}
 
 	if (!mysql_real_connect(&mysql, mysql_srv_ip.data(), mysql_login.data(), mysql_pass.data(), NULL, 0, NULL, 0))
 	{
-		cout << logTimeStamp() << "[MySQL] ERROR: Ошибка подключения к базе данных " << mysql_error(&mysql) << endl;
+		logging(logTimeStamp() + "[MySQL] ERROR: Ошибка подключения к базе данных " + mysql_error(&mysql));
+//		cout << logTimeStamp() << "[MySQL] ERROR: Ошибка подключения к базе данных " << mysql_error(&mysql) << endl;
 		exit(1);
 	}
 	else
 	{
-		cout << logTimeStamp() << "[MySQL] Соединение установлено." << endl;
+		logging(logTimeStamp() + "[MySQL] Соединение установлено.");
+//		cout << logTimeStamp() << "[MySQL] Соединение установлено." << endl;
 	}
 	mysql_set_character_set(&mysql, "utf8");
 	firstRun();
@@ -26,7 +29,8 @@ SQL_DB::SQL_DB()
 SQL_DB::~SQL_DB()
 {
 	mysql_close(&mysql);
-	cout << logTimeStamp() << "[MySQL] Соединение закрыто." << endl;
+	logging(logTimeStamp() + "[MySQL] Соединение закрыто.");
+//	cout << logTimeStamp() << "[MySQL] Соединение закрыто." << endl;
 }
 
 void SQL_DB::getConfig()
@@ -79,7 +83,7 @@ void SQL_DB::firstRun()
 	m_query += "msg_id integer NOT NULL REFERENCES " + mysql_table_AM + "(id), ";
 	m_query += "for_user BINARY(16) NOT NULL REFERENCES " + mysql_table_users + "(uuid), ";
 	m_query += "status INTEGER DEFAULT 0)";
-	sendRequest("CREATE TABLE PRIVATE MSG STATUS");
+	sendRequest("CREATE TABLE ALL MSG STATUS");
 
 	m_query += "CREATE PROCEDURE IF NOT EXISTS status_on_create_msg(in a INT) ";
 	m_query += "BEGIN ";
@@ -131,11 +135,13 @@ void SQL_DB::getRequest(const string& request)
 	mysql_query(&mysql, m_query.data());
 	if (result = mysql_store_result(&mysql))
 	{
-		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен успешно." << endl;
+		logging(logTimeStamp() + "[MySQL] Запрос " + request + " выполнен успешно.");
+//		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен успешно." << endl;
 	}
 	else
 	{
-		cout << logTimeStamp() << "[MySQL] Ошибка MySQL " << mysql_error(&mysql) << endl;
+		logging(logTimeStamp() + "[MySQL] Ошибка MySQL " + mysql_error(&mysql));
+//		cout << logTimeStamp() << "[MySQL] Ошибка MySQL " << mysql_error(&mysql) << endl;
 	}
 	m_query.clear();
 }
@@ -145,11 +151,13 @@ void SQL_DB::sendRequest(const string& request)
 	int query = mysql_query(&mysql, m_query.data());
 	if (query == 0)
 	{
-		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен успешно." << endl;
+		logging(logTimeStamp() + "[MySQL] Запрос " + request + " выполнен успешно.");
+//		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен успешно." << endl;
 	}
 	else
 	{
-		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен c ошибкой: " << query << endl;
+		logging(logTimeStamp() + "[MySQL] Запрос " + request + " выполнен c ошибкой: " + std::to_string(query));
+//		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен c ошибкой: " << query << endl;
 	}
 	m_query.clear();
 }
@@ -163,7 +171,8 @@ void SQL_DB::getUserBase()
 	{
 		User newUser(row[0], row[1], row[2], row[3], atoi(row[4]));
 		UserBase->addInBase(newUser);
-		cout << logTimeStamp() << "[MySQL] Пользователь " << newUser.name << " добавлен в базу" << endl;
+		logging(logTimeStamp() + "[MySQL] Пользователь \"" + newUser.name + "\" добавлен в базу");
+//		cout << logTimeStamp() << "[MySQL] Пользователь " << newUser.name << " добавлен в базу" << endl;
 	}
 	if (UserBase->getCount() == 0)
 	{
@@ -255,4 +264,12 @@ void SQL_DB::updAMStatus(const string& msgId, const string& forUser, const strin
 {
 	m_query += "UPDATE " + mysql_table_AMS + " SET status = " + status + " WHERE msg_id = " + msgId + " AND for_user = UUID_TO_BIN('" + forUser + "')";
 	sendRequest("UPDATE ALL MSG status");
+}
+
+void SQL_DB::logging(const string& entry)
+{
+	std::thread write(&Logger::recLogEntry, Log, std::cref(entry));
+	std::thread read(&Logger::readLogEntry, Log);
+	write.join();
+	read.join();
 }

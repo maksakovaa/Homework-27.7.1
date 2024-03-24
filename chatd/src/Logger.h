@@ -17,7 +17,7 @@ private:
 	string log_file = "/var/log/chatd/log.txt";
 	int diff = -1;
 #endif
-	std::fstream log;
+	std::fstream slog;
 	std::shared_mutex s_mutex;
 	string logEntry = "";
 };
