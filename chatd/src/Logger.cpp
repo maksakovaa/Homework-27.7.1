@@ -12,6 +12,7 @@ Logger::~Logger()
 void Logger::recLogEntry(const string& entry)
 {
 	s_mutex.lock();
+	slog << logTimeStamp();
 	slog << entry;
 	slog << "\n";
 	s_mutex.unlock();

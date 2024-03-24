@@ -6,20 +6,20 @@ SQL_DB::SQL_DB()
 	mysql_init(&mysql);
 	if (&mysql == NULL)
 	{
-		logging(logTimeStamp() + "[MySQL] ERROR: Ошибка создания MySQL дескриптора");
+		logging("[MySQL] ERROR: Ошибка создания MySQL дескриптора");
 //		cout << logTimeStamp() << "[MySQL] ERROR: Ошибка создания MySQL дескриптора" << endl;
 		exit(1);
 	}
 
 	if (!mysql_real_connect(&mysql, mysql_srv_ip.data(), mysql_login.data(), mysql_pass.data(), NULL, 0, NULL, 0))
 	{
-		logging(logTimeStamp() + "[MySQL] ERROR: Ошибка подключения к базе данных " + mysql_error(&mysql));
+		logging("[MySQL] ERROR: Ошибка подключения к базе данных " + string(mysql_error(&mysql)));
 //		cout << logTimeStamp() << "[MySQL] ERROR: Ошибка подключения к базе данных " << mysql_error(&mysql) << endl;
 		exit(1);
 	}
 	else
 	{
-		logging(logTimeStamp() + "[MySQL] Соединение установлено.");
+		logging("[MySQL] Соединение установлено.");
 //		cout << logTimeStamp() << "[MySQL] Соединение установлено." << endl;
 	}
 	mysql_set_character_set(&mysql, "utf8");
@@ -29,7 +29,7 @@ SQL_DB::SQL_DB()
 SQL_DB::~SQL_DB()
 {
 	mysql_close(&mysql);
-	logging(logTimeStamp() + "[MySQL] Соединение закрыто.");
+	logging("[MySQL] Соединение закрыто.");
 //	cout << logTimeStamp() << "[MySQL] Соединение закрыто." << endl;
 }
 
@@ -135,12 +135,12 @@ void SQL_DB::getRequest(const string& request)
 	mysql_query(&mysql, m_query.data());
 	if (result = mysql_store_result(&mysql))
 	{
-		logging(logTimeStamp() + "[MySQL] Запрос " + request + " выполнен успешно.");
+		logging("[MySQL] Запрос " + request + " выполнен успешно.");
 //		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен успешно." << endl;
 	}
 	else
 	{
-		logging(logTimeStamp() + "[MySQL] Ошибка MySQL " + mysql_error(&mysql));
+		logging("[MySQL] Ошибка MySQL " + string(mysql_error(&mysql)));
 //		cout << logTimeStamp() << "[MySQL] Ошибка MySQL " << mysql_error(&mysql) << endl;
 	}
 	m_query.clear();
@@ -151,12 +151,12 @@ void SQL_DB::sendRequest(const string& request)
 	int query = mysql_query(&mysql, m_query.data());
 	if (query == 0)
 	{
-		logging(logTimeStamp() + "[MySQL] Запрос " + request + " выполнен успешно.");
+		logging("[MySQL] Запрос " + request + " выполнен успешно.");
 //		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен успешно." << endl;
 	}
 	else
 	{
-		logging(logTimeStamp() + "[MySQL] Запрос " + request + " выполнен c ошибкой: " + std::to_string(query));
+		logging("[MySQL] Запрос " + request + " выполнен c ошибкой: " + std::to_string(query));
 //		cout << logTimeStamp() << "[MySQL] Запрос " << request << " выполнен c ошибкой: " << query << endl;
 	}
 	m_query.clear();
@@ -171,7 +171,7 @@ void SQL_DB::getUserBase()
 	{
 		User newUser(row[0], row[1], row[2], row[3], atoi(row[4]));
 		UserBase->addInBase(newUser);
-		logging(logTimeStamp() + "[MySQL] Пользователь \"" + newUser.name + "\" добавлен в базу");
+		logging("[MySQL] Пользователь \"" + newUser.name + "\" добавлен в базу");
 //		cout << logTimeStamp() << "[MySQL] Пользователь " << newUser.name << " добавлен в базу" << endl;
 	}
 	if (UserBase->getCount() == 0)
