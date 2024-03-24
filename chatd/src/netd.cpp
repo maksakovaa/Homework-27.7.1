@@ -393,11 +393,6 @@ void net::regMSG()
 	string temp = package;
 	cutRequestHeader(temp);
 
-	std::thread write(&Logger::recLogEntry, logNewMsg, temp);
-	std::thread read(&Logger::readLogEntry, logNewMsg);
-	write.join();
-	read.join();
-
 	Message newMsg = AllMsgBase->splitMsgPkg(temp);
 	if (newMsg.msgTo == "ALL")
 	{
@@ -409,7 +404,11 @@ void net::regMSG()
 		db_connect->regPrivateMsg(newMsg);
 		db_connect->getPerMsgBase(newMsg.msgFrom);
 	}
-	cout << logTimeStamp() << "[NET] Message " << newMsg.msgText << " send" << endl;
+	string log = logTimeStamp() + "[NET] Message \"" + newMsg.msgText + "\" send";
+	std::thread write(&Logger::recLogEntry, logNewMsg, std::cref(log));
+	std::thread read(&Logger::readLogEntry, logNewMsg);
+	write.join();
+	read.join();
 }
 
 void net::delUsr()
